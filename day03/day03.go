@@ -33,6 +33,20 @@ func ParseInput(data string) []string {
 	return strings.Split(data, "\n")
 }
 
+func Min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func Max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func Part1(lines []string) int {
 	sum := 0
 	for i, line := range lines {
@@ -41,19 +55,16 @@ func Part1(lines []string) int {
 				continue
 			}
 
-			for k := i - 1; k <= i+1; k++ {
+			for k := Max(0, i-1); k <= Min(i+1, len(lines)); k++ {
 				// new line always ends previous number
 				prev_was_number := false
-				for l := j - 1; l <= j+1; l++ {
-					if k < 0 || l < 0 || k >= len(lines) || l >= len(line) {
-						continue
-					}
+				for l := Max(0, j-1); l <= Min(j+1, len(line)); l++ {
 					if k == i && l == j {
 						// center point always ends previous number
 						prev_was_number = false
 						continue
 					}
-					
+
 					if '0' <= lines[k][l] && lines[k][l] <= '9' {
 						if !prev_was_number {
 							sum += ParseInt(lines[k], l)
@@ -78,19 +89,16 @@ func Part2(lines []string) int {
 			}
 
 			gears := make([]int, 0)
-			for k := i - 1; k <= i+1; k++ {
+			for k := Max(0, i-1); k <= Min(i+1, len(lines)); k++ {
 				// new line always ends previous number
 				prev_was_number := false
-				for l := j - 1; l <= j+1; l++ {
-					if k < 0 || l < 0 || k >= len(lines) || l >= len(line) {
-						continue
-					}
+				for l := Max(0, j-1); l <= Min(j+1, len(line)); l++ {
 					if k == i && l == j {
 						// center point always ends previous number
 						prev_was_number = false
 						continue
 					}
-					
+
 					if '0' <= lines[k][l] && lines[k][l] <= '9' {
 						if !prev_was_number {
 							gears = append(gears, ParseInt(lines[k], l))

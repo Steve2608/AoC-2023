@@ -83,7 +83,7 @@ func CardTree(ticket_id int, tickets []Ticket, lookup []int) int {
 	ticket := tickets[ticket_id]
 	n := 1
 	for i := ticket_id + 1; i < ticket.ticket_id+1+len(ticket.winning); i++ {
-		if lookup[i-1] == 0 {
+		if lookup[i] == 0 {
 			n += CardTree(i, tickets, lookup)
 		} else {
 			n += lookup[i]
@@ -98,7 +98,10 @@ func Part2(tickets []Ticket) int {
 	tickets_one_indexed := append([]Ticket{{}}, tickets...)
 	lookup := make([]int, 1+len(tickets))
 	for _, ticket := range tickets {
-		CardTree(ticket.ticket_id, tickets_one_indexed, lookup)
+		// only expand tree if we haven't already
+		if lookup[ticket.ticket_id] == 0 {
+			CardTree(ticket.ticket_id, tickets_one_indexed, lookup)
+		}
 	}
 
 	sum := 0

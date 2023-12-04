@@ -59,7 +59,9 @@ def part2(data: list[Ticket]) -> int:
     lookup = [0] + [0] * len(data)
 
     for ticket in data:
-        card_tree(ticket.ticket_id, lookup)
+        # only expand tree if we haven't already
+        if lookup[ticket.ticket_id] == 0:
+            card_tree(ticket.ticket_id, lookup)
 
     return sum(lookup)
 

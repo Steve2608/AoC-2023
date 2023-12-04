@@ -29,8 +29,8 @@ func ParseInt(line string, i int) int {
 	return num
 }
 
-func ParseInput(data *string) []string {
-	return strings.Split(*data, "\n")
+func ParseInput(data string) []string {
+	return strings.Split(data, "\n")
 }
 
 func Min(a, b int) int {
@@ -47,15 +47,15 @@ func Max(a, b int) int {
 	return b
 }
 
-func Part1(lines *[]string) int {
+func Part1(lines []string) int {
 	sum := 0
-	for i, line := range *lines {
+	for i, line := range lines {
 		for j, rune := range line {
 			if rune == '.' || '0' <= rune && rune <= '9' {
 				continue
 			}
 
-			for k := Max(0, i-1); k <= Min(i+1, len(*lines)); k++ {
+			for k := Max(0, i-1); k <= Min(i+1, len(lines)); k++ {
 				// new line always ends previous number
 				prev_was_number := false
 				for l := Max(0, j-1); l <= Min(j+1, len(line)); l++ {
@@ -65,9 +65,9 @@ func Part1(lines *[]string) int {
 						continue
 					}
 
-					if '0' <= (*lines)[k][l] && (*lines)[k][l] <= '9' {
+					if '0' <= lines[k][l] && lines[k][l] <= '9' {
 						if !prev_was_number {
-							sum += ParseInt((*lines)[k], l)
+							sum += ParseInt(lines[k], l)
 						}
 						prev_was_number = true
 					} else {
@@ -80,16 +80,16 @@ func Part1(lines *[]string) int {
 	return sum
 }
 
-func Part2(lines *[]string) int {
+func Part2(lines []string) int {
 	sum := 0
-	for i, line := range *lines {
+	for i, line := range lines {
 		for j, rune := range line {
 			if rune != '*' {
 				continue
 			}
 
 			gears := make([]int, 0)
-			for k := Max(0, i-1); k <= Min(i+1, len(*lines)); k++ {
+			for k := Max(0, i-1); k <= Min(i+1, len(lines)); k++ {
 				// new line always ends previous number
 				prev_was_number := false
 				for l := Max(0, j-1); l <= Min(j+1, len(line)); l++ {
@@ -99,9 +99,9 @@ func Part2(lines *[]string) int {
 						continue
 					}
 
-					if '0' <= (*lines)[k][l] && (*lines)[k][l] <= '9' {
+					if '0' <= lines[k][l] && lines[k][l] <= '9' {
 						if !prev_was_number {
-							gears = append(gears, ParseInt((*lines)[k], l))
+							gears = append(gears, ParseInt(lines[k], l))
 						}
 						prev_was_number = true
 					} else {
@@ -136,8 +136,8 @@ func main() {
 	defer PrintTime(start, "Elapsed time:")
 
 	text := ReadFile("inputs/day03.txt")
-	data := ParseInput(&text)
+	data := ParseInput(text)
 
-	fmt.Printf("Part1: %d\n", Part1(&data))
-	fmt.Printf("Part2: %d\n", Part2(&data))
+	fmt.Printf("Part1: %d\n", Part1(data))
+	fmt.Printf("Part2: %d\n", Part2(data))
 }

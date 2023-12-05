@@ -21,16 +21,14 @@ class Function:
         for d_start, s_start, length in self.ranges:
             # stop when no intervals left to process
             if not intervals:
-                break
+                return
 
             s_end = s_start + length
 
             # intervals for next step
             intervals_step = []
 
-            while intervals:
-                i_start, i_end = intervals.pop()
-
+            for i_start, i_end in intervals:
                 # left part of overlap
                 if (e := min(i_end, s_start)) > i_start:
                     intervals_step.append((i_start, e))
@@ -122,14 +120,11 @@ def part1(data: tuple[list[int], list[Function]]) -> int:
 
 def part2(data: tuple[list[int], list[Function]]) -> int:
     def seed_range_to_location(i: Interval) -> int:
-        minimums = []
-
         intervals = [i]
         for func in mapping_functions:
             intervals = list(func(intervals))
 
-        minimums.append(min(start for start, end in intervals))
-        return min(minimums)
+        return min(start for start, _ in intervals)
 
     seeds, mapping_functions = data
     # return minimum of all locations

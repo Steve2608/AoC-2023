@@ -22,12 +22,13 @@ def get_data(content: str) -> list[Game]:
             for sub_pull in pull.split(","):
                 amount, color = sub_pull.strip().split(" ")
                 amount = int(amount)
-                if color == "red":
-                    red = max(amount, red)
-                elif color == "green":
-                    green = max(amount, green)
-                elif color == "blue":
-                    blue = max(amount, blue)
+                match color:
+                    case "red":
+                        red = max(amount, red)
+                    case "green":
+                        green = max(amount, green)
+                    case "blue":
+                        blue = max(amount, blue)
 
         games.append(Game(game_id, red, green, blue))
     return games

@@ -2,190 +2,151 @@ import dataclasses
 
 from timing_util import Timing
 
-
-@dataclasses.dataclass(slots=True)
-class Map:
-    seed_to_soil_map: list[tuple[int, int, int]]
-    soil_to_fertilizer_map: list[tuple[int, int, int]]
-    fertilizer_to_water_map: list[tuple[int, int, int]]
-    water_to_light_map: list[tuple[int, int, int]]
-    light_to_temperature_map: list[tuple[int, int, int]]
-    temperature_to_humidity_map: list[tuple[int, int, int]]
-    humidity_to_location_map: list[tuple[int, int, int]]
-
-    def __post_init__(self) -> None:
-        pass
-
-    def seed_to_soil(self, seed: int) -> int:
-        for dst, src, rng in self.seed_to_soil_map:
-            if src <= seed < src + rng:
-                return dst + (seed - src)
-        return seed
-
-    def soil_to_seed(self, soil: int) -> int:
-        for dst, src, rng in self.seed_to_soil_map:
-            if dst <= soil < dst + rng:
-                return src + (soil - dst)
-        return soil
-
-    def soil_to_fertilizer(self, soil: int) -> int:
-        for dst, src, rng in self.soil_to_fertilizer_map:
-            if src <= soil < src + rng:
-                return dst + (soil - src)
-        return soil
-
-    def fertilizer_to_soil(self, fertilizer: int) -> int:
-        for dst, src, rng in self.soil_to_fertilizer_map:
-            if dst <= fertilizer < dst + rng:
-                return src + (fertilizer - dst)
-        return fertilizer
-
-    def fertilizer_to_water(self, fertilizer: int) -> int:
-        for dst, src, rng in self.fertilizer_to_water_map:
-            if src <= fertilizer < src + rng:
-                return dst + (fertilizer - src)
-        return fertilizer
-
-    def water_to_fertilizer(self, water: int) -> int:
-        for dst, src, rng in self.fertilizer_to_water_map:
-            if dst <= water < dst + rng:
-                return src + (water - dst)
-        return water
-
-    def water_to_light(self, water: int) -> int:
-        for dst, src, rng in self.water_to_light_map:
-            if src <= water < src + rng:
-                return dst + (water - src)
-        return water
-
-    def light_to_water(self, light: int) -> int:
-        for dst, src, rng in self.water_to_light_map:
-            if dst <= light < dst + rng:
-                return src + (light - dst)
-        return light
-
-    def light_to_temperature(self, light: int) -> int:
-        for dst, src, rng in self.light_to_temperature_map:
-            if src <= light < src + rng:
-                return dst + (light - src)
-        return light
-
-    def temperature_to_light(self, temperature: int) -> int:
-        for dst, src, rng in self.light_to_temperature_map:
-            if dst <= temperature < dst + rng:
-                return src + (temperature - dst)
-        return temperature
-
-    def temperature_to_humidity(self, temperature: int) -> int:
-        for dst, src, rng in self.temperature_to_humidity_map:
-            if src <= temperature < src + rng:
-                return dst + (temperature - src)
-        return temperature
-
-    def humidity_to_temperature(self, humidity: int) -> int:
-        for dst, src, rng in self.temperature_to_humidity_map:
-            if dst <= humidity < dst + rng:
-                return src + (humidity - dst)
-        return humidity
-
-    def humidity_to_location(self, humidity: int) -> int:
-        for dst, src, rng in self.humidity_to_location_map:
-            if src <= humidity < src + rng:
-                return dst + (humidity - src)
-        return humidity
-
-    def location_to_humidity(self, location: int) -> int:
-        for dst, src, rng in self.humidity_to_location_map:
-            if dst <= location < dst + rng:
-                return src + (location - dst)
-        return location
+Range = tuple[int, int, int]
+Interval = tuple[int, int]
 
 
-def get_data(content: str) -> tuple[list[int], Map]:
+@dataclasses.dataclass(slots=True, frozen=True)
+class Function:
+    ranges: list[Range]
+
+    def apply_one(self, value: int) -> int:
+        for dst, src, length in self.ranges:
+            if src <= value < src + length:
+                return dst + (value - src)
+        return value
+
+    def apply_many(self, intervals: list[Interval]):
+        return_ranges = []
+        for dst, src, length in self.ranges:
+            # stop when no intervals left to process
+            if not intervals:
+                break
+
+            src_end = src + length
+
+            # intervals for next step
+            intervals_step = []
+
+            while intervals:
+                start, end = intervals.pop()
+
+                # left part of overlap
+                if (e := min(end, src)) > start:
+                    intervals_step.append((start, e))
+
+                # overlap
+                if (e := min(end, src_end)) > (s := max(start, src)):
+                    i: Interval = dst + (s - src), dst + (e - src)
+                    return_ranges.append(i)
+
+                # right part of overlap
+                if end > (s := max(start, src_end)):
+                    intervals_step.append((s, end))
+
+            intervals = intervals_step
+
+        return_ranges.extend(intervals)
+        return return_ranges
+
+    def __call__(self, value: int) -> int:
+        if isinstance(value, list):
+            return self.apply_many(value)
+        elif isinstance(value, int):
+            return self.apply_one(value)
+        raise ValueError(f"Invalid type: {type(value)}")
+
+
+def get_data(content: str) -> tuple[list[int], list[Function]]:
     lines = list(filter(bool, content.split("\n")))
     seeds = list(map(int, lines[0][len("seeds: ") :].split()))
 
-    seed_to_soil_map = []
-    soil_to_fertilizer_map = []
-    fertilizer_to_water_map = []
-    water_to_light_map = []
-    light_to_temperature_map = []
-    temperature_to_humidity_map = []
-    humidity_to_location_map = []
+    seed_to_soil = []
+    soil_to_fertilizer = []
+    fertilizer_to_water = []
+    water_to_light = []
+    light_to_temperature = []
+    temperature_to_humidity = []
+    humidity_to_location = []
 
     for line in lines[1:]:
         match line:
             case "seed-to-soil map:":
-                target = seed_to_soil_map
+                target = seed_to_soil
             case "soil-to-fertilizer map:":
-                target = soil_to_fertilizer_map
+                target = soil_to_fertilizer
             case "fertilizer-to-water map:":
-                target = fertilizer_to_water_map
+                target = fertilizer_to_water
             case "water-to-light map:":
-                target = water_to_light_map
+                target = water_to_light
             case "light-to-temperature map:":
-                target = light_to_temperature_map
+                target = light_to_temperature
             case "temperature-to-humidity map:":
-                target = temperature_to_humidity_map
+                target = temperature_to_humidity
             case "humidity-to-location map:":
-                target = humidity_to_location_map
+                target = humidity_to_location
             case _:
-                target.append(tuple(map(int, line.split())))
+                target.append(Range(map(int, line.split())))
+                # sort by src
+                target.sort(key=lambda dst_src_len: dst_src_len[1])
 
     return (
         seeds,
-        Map(
-            seed_to_soil_map,
-            soil_to_fertilizer_map,
-            fertilizer_to_water_map,
-            water_to_light_map,
-            light_to_temperature_map,
-            temperature_to_humidity_map,
-            humidity_to_location_map,
+        list(
+            map(
+                Function,
+                [
+                    seed_to_soil,
+                    soil_to_fertilizer,
+                    fertilizer_to_water,
+                    water_to_light,
+                    light_to_temperature,
+                    temperature_to_humidity,
+                    humidity_to_location,
+                ],
+            )
         ),
     )
 
 
-def part1(data: tuple[list[int], Map]) -> int:
-    def seed_to_location(seed: int) -> int:
-        soil = m.seed_to_soil(seed)
-        fertilizer = m.soil_to_fertilizer(soil)
-        water = m.fertilizer_to_water(fertilizer)
-        light = m.water_to_light(water)
-        temperature = m.light_to_temperature(light)
-        humidity = m.temperature_to_humidity(temperature)
-        location = m.humidity_to_location(humidity)
-        return location
+def part1(data: tuple[list[int], list[Function]]) -> int:
+    def seed_to_location(value: int) -> int:
+        for func in mapping_functions:
+            value = func(value)
+        return value
 
-    seeds, m = data
+    seeds, mapping_functions = data
     return min(map(seed_to_location, seeds))
 
 
-def part2(data: tuple[list[int], Map]) -> int:
-    def location_to_seed(seed: int) -> int:
-        humidity = m.location_to_humidity(seed)
-        temperature = m.humidity_to_temperature(humidity)
-        light = m.temperature_to_light(temperature)
-        water = m.light_to_water(light)
-        fertilizer = m.water_to_fertilizer(water)
-        soil = m.fertilizer_to_soil(fertilizer)
-        seed = m.soil_to_seed(soil)
-        return seed
+def part2(data: tuple[list[int], list[Function]]) -> int:
+    def seed_range_to_location(i: Interval) -> int:
+        minimums = []
 
-    def count(start: int):
-        i = start
-        while True:
-            yield i
-            i += 1
+        intervals = [i]
+        for func in mapping_functions:
+            intervals = func(intervals)
 
-    seeds, m = data
+        minimums.append(min(start for start, end in intervals))
+        return min(minimums)
 
-    for loc in count(0):
-        seed = location_to_seed(loc)
-        for start, l in zip(seeds[::2], seeds[1::2]):
-            if start <= seed < start + l:
-                return loc
-    # TODO: 104070862
+    seeds, mapping_functions = data
+    # return minimum of all locations
+    return min(
+        # map to minimum location for range
+        map(
+            seed_range_to_location,
+            map(
+                # map (start, len) to (start, end)
+                lambda s_l: (s_l[0], s_l[0] + s_l[1]),
+                # (start, len)
+                zip(
+                    seeds[::2],
+                    seeds[1::2],
+                ),
+            ),
+        )
+    )
 
 
 if __name__ == "__main__":

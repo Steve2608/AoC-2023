@@ -1,4 +1,5 @@
 import dataclasses
+from typing import Iterator
 
 from timing_util import Timing
 
@@ -16,40 +17,40 @@ class Function:
                 return dst + (value - src)
         return value
 
-    def apply_many(self, intervals: list[Interval]):
-        return_ranges = []
-        for dst, src, length in self.ranges:
+    def apply_many(self, intervals: list[Interval]) -> Iterator[Interval]:
+        for d_start, s_start, length in self.ranges:
             # stop when no intervals left to process
             if not intervals:
                 break
 
-            src_end = src + length
+            s_end = s_start + length
 
             # intervals for next step
             intervals_step = []
 
             while intervals:
-                start, end = intervals.pop()
+                i_start, i_end = intervals.pop()
 
                 # left part of overlap
-                if (e := min(end, src)) > start:
-                    intervals_step.append((start, e))
+                if (e := min(i_end, s_start)) > i_start:
+                    intervals_step.append((i_start, e))
 
                 # overlap
-                if (e := min(end, src_end)) > (s := max(start, src)):
-                    i: Interval = dst + (s - src), dst + (e - src)
-                    return_ranges.append(i)
+                if (e := min(i_end, s_end)) > (s := max(i_start, s_start)):
+                    i: Interval = d_start + (s - s_start), d_start + (e - s_start)
+                    # done with this interval for this mapping
+                    yield i
 
                 # right part of overlap
-                if end > (s := max(start, src_end)):
-                    intervals_step.append((s, end))
+                if i_end > (s := max(i_start, s_end)):
+                    intervals_step.append((s, i_end))
 
             intervals = intervals_step
 
-        return_ranges.extend(intervals)
-        return return_ranges
+        # map left-over intervals 1:1 since no range is applicable
+        yield from intervals
 
-    def __call__(self, value: int) -> int:
+    def __call__(self, value: int) -> int | Iterator[Interval]:
         if isinstance(value, list):
             return self.apply_many(value)
         elif isinstance(value, int):
@@ -125,7 +126,7 @@ def part2(data: tuple[list[int], list[Function]]) -> int:
 
         intervals = [i]
         for func in mapping_functions:
-            intervals = func(intervals)
+            intervals = list(func(intervals))
 
         minimums.append(min(start for start, end in intervals))
         return min(minimums)

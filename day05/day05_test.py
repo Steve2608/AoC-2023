@@ -20,7 +20,7 @@ soil-to-fertilizer map:
 
 fertilizer-to-water map:
 49 53 8
-0 11 42
+0 11 42 
 42 0 7
 57 7 4
 

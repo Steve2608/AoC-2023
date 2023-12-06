@@ -59,7 +59,7 @@ func SolveClosedForm(time, distance int) (int, int) {
 	discriminant := math.Sqrt(time_f*time_f - 4*distance_f)
 	w_time_min := math.Floor((time_f-discriminant)/2 + 1)
 	w_time_max := math.Ceil((time_f+discriminant)/2 - 1)
-	
+
 	return int(w_time_min), int(w_time_max)
 }
 

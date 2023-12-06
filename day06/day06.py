@@ -2,14 +2,12 @@ import math
 
 from timing_util import Timing
 
-Race = tuple[int, int]
 
-
-def get_data(content: str) -> list[Race]:
+def get_data(content: str) -> tuple[list[int], list[int]]:
     times, distances = content.split("\n")
     times = times[len("Time:") :].strip().split()
     distances = distances[len("Distance:") :].strip().split()
-    return list(zip(map(int, times), map(int, distances)))
+    return list(map(int, times)), list(map(int, distances))
 
 
 def solve_closed_form(time: int, distance: int) -> tuple[int, int]:
@@ -19,17 +17,16 @@ def solve_closed_form(time: int, distance: int) -> tuple[int, int]:
     return w_time_min, w_time_max
 
 
-def part1(data: list[Race]) -> int:
+def part1(data: tuple[list[int], list[int]]) -> int:
     prod = 1
-    for time, distance in data:
+    for time, distance in zip(*data):
         w_time_min, w_time_max = solve_closed_form(time, distance)
         prod *= w_time_max - w_time_min + 1
     return prod
 
 
-def part2(data: list[Race]) -> int:
-    time = int("".join(map(str, (td[0] for td in data))))
-    distance = int("".join(map(str, (td[1] for td in data))))
+def part2(data: tuple[list[int], list[int]]) -> int:
+    time, distance = (int("".join(map(str, d))) for d in data)
 
     w_time_min, w_time_max = solve_closed_form(time, distance)
     return w_time_max - w_time_min + 1

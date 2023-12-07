@@ -1,16 +1,43 @@
 import collections
-import dataclasses
-from functools import cached_property, total_ordering
+import dataclasses as dc
+from functools import total_ordering
 
 from timing_util import Timing
 
 
 @total_ordering
-@dataclasses.dataclass(frozen=True)
+@dc.dataclass(slots=True)
 class Hand:
     cards: str
     bid: int
     jacks_are_jokers: bool = False
+
+    card_values: tuple[int] = dc.field(init=False)
+    best_hand: str = dc.field(init=False)
+    _n_unique_same: tuple[int, int] = dc.field(init=False)
+
+    def __post_init__(self) -> None:
+        def _n_unique_same(self) -> tuple[int, int]:
+            counter = collections.Counter(self.best_hand)
+            most_of_a_kind = max(counter.values())
+            return len(counter), most_of_a_kind
+        
+        def best_hand(self) -> str:
+            if not self.jacks_are_jokers or "J" not in self.cards:
+                return self.cards
+
+            counts = collections.Counter(self.cards)
+            # remove jacks
+            if counts.pop("J") == 5:
+                # if hand is all jacks return 5 aces
+                return "A" * 5
+
+            best_card = max(counts, key=lambda k: (counts.get(k), self.card_value(k)))
+            return "".join(card if card != "J" else best_card for card in self.cards)
+        
+        self.card_values = tuple(map(self.card_value, self.cards))
+        self.best_hand = best_hand(self)
+        self._n_unique_same = _n_unique_same(self)
 
     def __lt__(self, other: "Hand") -> bool:
         n_unique_self, n_same_self = self._n_unique_same
@@ -50,30 +77,6 @@ class Hand:
                 return 14
             case _:
                 return int(card)
-
-    @cached_property
-    def card_values(self) -> list[int]:
-        return tuple(map(self.card_value, self.cards))
-
-    @cached_property
-    def _n_unique_same(self) -> tuple[int, int]:
-        counter = collections.Counter(self.best_hand)
-        most_of_a_kind = max(counter.values())
-        return len(counter), most_of_a_kind
-
-    @cached_property
-    def best_hand(self) -> tuple[int]:
-        if not self.jacks_are_jokers or "J" not in self.cards:
-            return self.cards
-
-        counts = collections.Counter(self.cards)
-        # remove jacks
-        if counts.pop("J") == 5:
-            # if hand is all jacks return 5 aces
-            return "A" * 5
-
-        best_card = max(counts, key=lambda k: (counts.get(k), self.card_value(k)))
-        return "".join(card if card != "J" else best_card for card in self.cards)
 
 
 def get_data(content: str) -> list[Hand]:

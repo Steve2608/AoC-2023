@@ -12,17 +12,24 @@ class Hand:
     bid: int
     jacks_are_jokers: bool = False
 
-    card_values: tuple[int] = dc.field(init=False)
-    best_hand: str = dc.field(init=False)
+    card_values: int = dc.field(init=False)
+    best_cards: str = dc.field(init=False)
     _n_unique_same: tuple[int, int] = dc.field(init=False)
 
     def __post_init__(self) -> None:
+        def card_values(self) -> int:
+            value = 0
+            for card in self.cards:
+                value = value * 100 + self.card_value(card)
+
+            return value
+
         def _n_unique_same(self) -> tuple[int, int]:
-            counter = collections.Counter(self.best_hand)
+            counter = collections.Counter(self.best_cards)
             most_of_a_kind = max(counter.values())
             return len(counter), most_of_a_kind
-        
-        def best_hand(self) -> str:
+
+        def best_cards(self) -> str:
             if not self.jacks_are_jokers or "J" not in self.cards:
                 return self.cards
 
@@ -34,9 +41,9 @@ class Hand:
 
             best_card = max(counts, key=lambda k: (counts.get(k), self.card_value(k)))
             return "".join(card if card != "J" else best_card for card in self.cards)
-        
-        self.card_values = tuple(map(self.card_value, self.cards))
-        self.best_hand = best_hand(self)
+
+        self.card_values = card_values(self)
+        self.best_cards = best_cards(self)
         self._n_unique_same = _n_unique_same(self)
 
     def __lt__(self, other: "Hand") -> bool:

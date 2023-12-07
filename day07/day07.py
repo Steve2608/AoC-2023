@@ -12,14 +12,14 @@ class Hand:
     bid: int
     jacks_are_jokers: bool = False
 
-    card_values: int = dc.field(init=False)
     best_cards: str = dc.field(init=False)
+    card_values: int = dc.field(init=False)
     _n_unique_same: tuple[int, int] = dc.field(init=False)
 
     def __post_init__(self) -> None:
         def card_values(self) -> int:
             value = 0
-            for card in self.cards:
+            for card in self.best_cards:
                 value = value * 100 + self.card_value(card)
 
             return value
@@ -42,8 +42,8 @@ class Hand:
             best_card = max(counts, key=lambda k: (counts.get(k), self.card_value(k)))
             return "".join(card if card != "J" else best_card for card in self.cards)
 
-        self.card_values = card_values(self)
         self.best_cards = best_cards(self)
+        self.card_values = card_values(self)
         self._n_unique_same = _n_unique_same(self)
 
     def __lt__(self, other: "Hand") -> bool:

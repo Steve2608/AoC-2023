@@ -1,4 +1,4 @@
-import dataclasses
+import dataclasses as dc
 from typing import Iterator
 
 from timing_util import Timing
@@ -7,7 +7,7 @@ Range = tuple[int, int, int]
 Interval = tuple[int, int]
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
+@dc.dataclass(slots=True, frozen=True)
 class Function:
     ranges: list[Range]
 

@@ -1,9 +1,9 @@
-import dataclasses
+import dataclasses as dc
 
 from timing_util import Timing
 
 
-@dataclasses.dataclass(slots=True)
+@dc.dataclass(slots=True)
 class Game:
     game_id: int
     max_red: int

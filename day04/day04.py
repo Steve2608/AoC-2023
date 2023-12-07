@@ -1,14 +1,14 @@
-import dataclasses
+import dataclasses as dc
 
 from timing_util import Timing
 
 
-@dataclasses.dataclass(slots=True)
+@dc.dataclass(slots=True)
 class Ticket:
     ticket_id: int
     want: set[int]
     have: set[int]
-    winning: set[int] = dataclasses.field(init=False)
+    winning: set[int] = dc.field(init=False)
 
     def __post_init__(self) -> None:
         self.winning = self.want & self.have
@@ -32,8 +32,8 @@ def get_data(content: str) -> list[Ticket]:
 
 def part1(data: list[Ticket]) -> int:
     def score(ticket: Ticket) -> int:
-        if len(ticket.winning) > 0:
-            return 1 << (len(ticket.winning) - 1)
+        if ticket.winning:
+            return 1 << len(ticket.winning) - 1
         return 0
 
     return sum(map(score, data))
@@ -46,10 +46,10 @@ def part2(data: list[Ticket]) -> int:
 
         n = 1
         for i in range(ticket_id + 1, ticket_id + 1 + n_winning):
-            if not lookup[i]:
-                n += card_tree(i, lookup)
-            else:
+            if lookup[i]:
                 n += lookup[i]
+            else:
+                n += card_tree(i, lookup)
 
         lookup[ticket_id] = n
         return n

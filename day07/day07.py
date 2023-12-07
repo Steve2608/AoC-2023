@@ -1,6 +1,6 @@
 import collections
 import dataclasses
-from functools import total_ordering
+from functools import cached_property, total_ordering
 
 from timing_util import Timing
 
@@ -13,21 +13,19 @@ class Hand:
     jacks_are_jokers: bool = False
 
     def __lt__(self, other: "Hand") -> bool:
-        self_count = collections.Counter(self.best_hand)
-        self_of_a_kind = max(self_count.values())
+        n_unique_self, n_same_self = self._n_unique_same
+        n_unique_other, n_same_other = other._n_unique_same
 
-        other_count = collections.Counter(other.best_hand)
-        other_of_a_kind = max(other_count.values())
-
-        # other has more cards of same suit than self
-        if self_of_a_kind < other_of_a_kind:
+        # self has less cards of same suit than other
+        if n_same_self < n_same_other:
             return True
         # self has more cards of same suit than other
-        elif self_of_a_kind > other_of_a_kind:
+        elif n_same_self > n_same_other:
             return False
-        # if self has more unique cards than other, it has to be worse
-        elif len(self_count) != len(other_count):
-            return len(self_count) > len(other_count)
+        # self has different amount of unique cards -> one has to have better hand
+        elif n_unique_self != n_unique_other:
+            # if self has more unique cards than other, it has to be worse
+            return n_unique_self > n_unique_other
         # compare by card value
         else:
             return self.card_values < other.card_values
@@ -53,11 +51,17 @@ class Hand:
             case _:
                 return int(card)
 
-    @property
+    @cached_property
     def card_values(self) -> list[int]:
         return tuple(map(self.card_value, self.cards))
 
-    @property
+    @cached_property
+    def _n_unique_same(self) -> tuple[int, int]:
+        counter = collections.Counter(self.best_hand)
+        most_of_a_kind = max(counter.values())
+        return len(counter), most_of_a_kind
+
+    @cached_property
     def best_hand(self) -> tuple[int]:
         if not self.jacks_are_jokers or "J" not in self.cards:
             return self.cards

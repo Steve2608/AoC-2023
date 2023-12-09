@@ -15,8 +15,6 @@ def part1(data) -> int:
             return 0
         return sequence[-1] + next_in_sequence(differences(sequence))
 
-    for seq in data:
-        print(next_in_sequence(seq))
     return sum(map(next_in_sequence, data))
 
 

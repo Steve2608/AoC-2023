@@ -68,7 +68,11 @@ class Hand:
         if other is None or not isinstance(other, Hand):
             return False
 
-        return self.cards == other.cards and self.bid == other.bid and self.jacks_are_jokers == other.jacks_are_jokers
+        return (
+            self.cards == other.cards
+            and self.bid == other.bid
+            and self.jacks_are_jokers == other.jacks_are_jokers
+        )
 
     def card_value(self, card: str) -> int:
         match card:

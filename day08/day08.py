@@ -14,7 +14,12 @@ def get_data(content: str) -> tuple[str, dict[str, tuple[str, str]]]:
     return directions, nodes
 
 
-def follow_path(curr: str, directions: str, nodes: dict[str, tuple[str, str]], is_end: Callable[[str], bool]):
+def follow_path(
+    curr: str,
+    directions: str,
+    nodes: dict[str, tuple[str, str]],
+    is_end: Callable[[str], bool],
+):
     for i, direction in enumerate(it.cycle(directions)):
         if is_end(curr):
             return i
@@ -36,7 +41,12 @@ def part2(data: tuple[str, dict[str, tuple[str, str]]]) -> int:
         return node[-1] == "Z"
 
     directions, nodes = data
-    return math.lcm(*(follow_path(start, directions, nodes, is_end) for start in nodes if start[-1] == "A"))
+    return math.lcm(
+        *(
+            follow_path(start, directions, nodes, is_end)
+            for start in filter(lambda node: node[-1] == "A", nodes)
+        )
+    )
 
 
 if __name__ == "__main__":

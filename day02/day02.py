@@ -15,10 +15,10 @@ def get_data(content: str) -> list[Game]:
     games = []
     for line in content.split("\n"):
         colon_idx = line.index(":")
-        game_id = int(line[len("Game ") :colon_idx])
+        game_id = int(line[len("Game ") : colon_idx])
 
         red, green, blue = 0, 0, 0
-        for pull in line[colon_idx + 2:].split(";"):
+        for pull in line[colon_idx + 2 :].split(";"):
             for sub_pull in pull.split(","):
                 amount, color = sub_pull.strip().split(" ")
                 amount = int(amount)

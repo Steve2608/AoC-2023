@@ -64,6 +64,7 @@ def is_connected(src: tuple[int, int], dst: tuple[int, int], grid: list[list[str
 
 
 def trace_path(start: tuple[int, int], grid: list[list[str]]) -> list[tuple[int, int]]:
+    M, N = len(grid), len(grid[0])
     visited = set()
     path = []
     curr = start
@@ -73,7 +74,7 @@ def trace_path(start: tuple[int, int], grid: list[list[str]]) -> list[tuple[int,
 
         x, y = curr
         for i, j in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
-            if i < 0 or i >= len(grid) or j < 0 or j >= len(grid[i]):
+            if i < 0 or i >= M or j < 0 or j >= N:
                 continue
 
             if (step := (i, j)) not in visited and is_connected(curr, step, grid):
@@ -92,12 +93,6 @@ def part1(data: tuple[tuple[int, int], list[list[str]]]) -> int:
 
 def set_tile(x: int, y: int, tile: str, zoomed: list[list[str]]):
     match tile:
-        case ".":
-            fill_in = [
-                [" ", " ", " "],
-                [" ", " ", " "],
-                [" ", " ", " "],
-            ]
         case "|":
             fill_in = [
                 [" ", "x", " "],
@@ -142,7 +137,7 @@ def set_tile(x: int, y: int, tile: str, zoomed: list[list[str]]):
         zoomed[x_][y * 3 : (y + 1) * 3] = fill
 
 
-def init_zoomed(grid: list[list[str]], path: set[tuple[int, int]]):
+def init_zoomed(grid: list[list[str]], path: set[tuple[int, int]]) -> list[list[str]]:
     # replace every tile with a 3-by-3 "zoomed in" tile
     zoomed = [[" " for _ in range(len(grid[0] * 3))] for _ in range(len(grid) * 3)]
     for x, line in enumerate(grid):
@@ -164,6 +159,7 @@ def is_inside(
     if start in known_outside:
         return False
 
+    M, N = len(zoomed), len(zoomed[0])
     visited = set()
     fringe = collections.deque([start])
     while fringe:
@@ -174,7 +170,7 @@ def is_inside(
 
         x, y = curr
         for i, j in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
-            if i < 0 or i >= len(zoomed) or j < 0 or j >= len(zoomed[i]):
+            if i < 0 or i >= M or j < 0 or j >= N:
                 known_outside.update(visited)
                 return False
 
@@ -201,7 +197,7 @@ def count_inside(grid: list[list[str]], zoomed: list[list[str]], path: set[tuple
     return n
 
 
-def part2(data) -> int:
+def part2(data: tuple[tuple[int, int], list[list[str]]]) -> int:
     start, grid = data
 
     path = set(trace_path(start, grid))

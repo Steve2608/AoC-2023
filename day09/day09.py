@@ -9,7 +9,7 @@ def differences(sequence: list[int]) -> list[int]:
     return [b - a for a, b in zip(sequence[:-1], sequence[1:])]
 
 
-def part1(data) -> int:
+def part1(data: list[list[int]]) -> int:
     def next_in_sequence(sequence: list[int]):
         if not any(sequence):
             return 0
@@ -18,7 +18,7 @@ def part1(data) -> int:
     return sum(map(next_in_sequence, data))
 
 
-def part2(data) -> int:
+def part2(data: list[list[int]]) -> int:
     def next_in_sequence(sequence: list[int]):
         if not any(sequence):
             return 0

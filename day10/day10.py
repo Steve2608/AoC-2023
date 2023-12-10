@@ -14,12 +14,12 @@ def get_data(content: str) -> tuple[tuple[int, int], list[list[str]]]:
 
 def starting_pipe(start: tuple[int, int], grid: list[list[str]]):
     x, y = start
-    connect_up = True if (x - 1 >= 0 and grid[x - 1][y]) in {"|", "F", "7"} else False
-    connect_down = True if (x + 1 < len(grid) and grid[x + 1][y]) in {"|", "L", "J"} else False
-    connect_left = True if (y - 1 >= 0 and grid[x][y - 1]) in {"-", "L", "F"} else False
-    connect_right = True if (y + 1 < len(grid[x]) and grid[x][y + 1]) in {"-", "J", "7"} else False
+    up = x - 1 >= 0 and grid[x - 1][y] in "|F7"
+    down = x + 1 < len(grid) and grid[x + 1][y] in "|LJ"
+    left = y - 1 >= 0 and grid[x][y - 1] in "-LF"
+    right = y + 1 < len(grid[x]) and grid[x][y + 1] in "-J7"
 
-    match (connect_up, connect_down, connect_left, connect_right):
+    match (up, down, left, right):
         case (True, True, False, False):
             return "|"
         case (True, False, True, False):
@@ -33,7 +33,7 @@ def starting_pipe(start: tuple[int, int], grid: list[list[str]]):
         case (False, False, True, True):
             return "-"
         case _:
-            raise ValueError(f"Illegal pipe required for {(connect_up, connect_down, connect_left, connect_right)}")
+            raise ValueError(f"Illegal pipe required for {(up, down, left, right)}")
 
 
 def is_connected(src: tuple[int, int], dst: tuple[int, int], grid: list[list[str]]) -> bool:
@@ -185,7 +185,11 @@ def is_inside(
     return True
 
 
-def count_inside(grid: list[list[str]], zoomed: list[list[str]], path: set[tuple[int, int]]) -> int:
+def count_inside(
+    grid: list[list[str]],
+    zoomed: list[list[str]],
+    path: set[tuple[int, int]],
+) -> int:
     n = 0
     known_outside = set()
     known_inside = set()

@@ -65,7 +65,7 @@ func SolveClosedForm(time, distance int) (int, int) {
 
 func Part1(times, distances []int) int {
 	prod := 1
-	for i := 0; i < len(times); i++ {
+	for i := range times {
 		time := times[i]
 		distance := distances[i]
 		w_time_min, w_time_max := SolveClosedForm(time, distance)

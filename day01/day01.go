@@ -103,7 +103,7 @@ func ParseNumberLeft(line string) int {
 			return 8
 		}
 	}
-	panic(errors.New("Illegal state reached"))
+	panic(errors.New("illegal state reached"))
 }
 
 func ParseNumberRight(line string) int {
@@ -152,7 +152,7 @@ func ParseNumberRight(line string) int {
 			return 8
 		}
 	}
-	panic(errors.New("Illegal state reached"))
+	panic(errors.New("illegal state reached"))
 }
 
 func Part2(lines []string) int {

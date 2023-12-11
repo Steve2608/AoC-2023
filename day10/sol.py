@@ -10,6 +10,7 @@ def get_data(content: str) -> tuple[tuple[int, int], list[list[str]]]:
             y = line.index("S")
             line[y] = starting_pipe(start := (x, y), grid)
             return start, grid
+    raise ValueError
 
 
 def starting_pipe(start: tuple[int, int], grid: list[list[str]]):

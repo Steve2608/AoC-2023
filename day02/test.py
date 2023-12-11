@@ -1,6 +1,6 @@
 import unittest
 
-from day02 import get_data, part1, part2
+from day02.sol import get_data, part1, part2
 
 
 class AoCTest(unittest.TestCase):

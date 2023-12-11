@@ -7,21 +7,10 @@ from timing_util import Timing
 def get_data(content: str) -> tuple[set[tuple[int, int]], list[int], list[int]]:
     grid = content.split("\n")
 
-    galaxies = set()
-    for x, line in enumerate(grid):
-        for y, c in enumerate(line):
-            if c == "#":
-                galaxies.add((x, y))
+    galaxies = {(x, y) for x, line in enumerate(grid) for y, c in enumerate(line) if c == "#"}
 
-    expansion_rows = []
-    for x, line in enumerate(grid):
-        if "#" not in line:
-            expansion_rows.append(x)
-
-    expansion_cols = []
-    for y in range(len(grid[0])):
-        if all(line[y] != "#" for line in grid):
-            expansion_cols.append(y)
+    expansion_rows = [x for x, line in enumerate(grid) if "#" not in line]
+    expansion_cols = [y for y in range(len(grid[0])) if not any(line[y] == "#" for line in grid)]
 
     return galaxies, expansion_rows, expansion_cols
 

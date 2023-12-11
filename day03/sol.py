@@ -45,7 +45,7 @@ def part1(data: list[list[str | int]]) -> int:
 
                     if isinstance(data[k][l], int):
                         if not prev_was_number:
-                            s += data[k][l]
+                            s += data[k][l]  # pyright: ignore[reportGeneralTypeIssues]
                         prev_was_number = True
                     else:
                         prev_was_number = False

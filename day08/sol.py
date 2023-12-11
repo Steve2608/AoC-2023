@@ -26,6 +26,7 @@ def follow_path(
 
         # coerce boolean to index: false -> left; true -> right
         curr = nodes[curr][direction == "R"]
+    raise ValueError
 
 
 def part1(data: tuple[str, dict[str, tuple[str, str]]]) -> int:

@@ -42,7 +42,7 @@ def part1(data: list[Ticket]) -> int:
 def part2(data: list[Ticket]) -> int:
     def card_tree(ticket_id: int, lookup: dict[int, int]) -> int:
         ticket = ticket_map[ticket_id]
-        n_winning = len(ticket.winning)
+        n_winning = len(ticket.winning)  # pyright: ignore[reportOptionalMemberAccess]
 
         n = 1
         for i in range(ticket_id + 1, ticket_id + 1 + n_winning):
@@ -61,7 +61,7 @@ def part2(data: list[Ticket]) -> int:
     for ticket in data:
         # only expand tree if we haven't already
         if lookup[ticket.ticket_id] == 0:
-            card_tree(ticket.ticket_id, lookup)
+            card_tree(ticket.ticket_id, lookup)  # pyright: ignore[reportGeneralTypeIssues]
 
     return sum(lookup)
 

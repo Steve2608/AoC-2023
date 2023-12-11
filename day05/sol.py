@@ -85,9 +85,13 @@ def get_data(content: str) -> tuple[list[int], list[Function]]:
             case "humidity-to-location map:":
                 target = humidity_to_location
             case _:
-                target.append(Range(map(int, line.split())))
+                target.append(  # pyright: ignore[reportUnboundVariable]
+                    Range(map(int, line.split()))
+                )
                 # sort by src
-                target.sort(key=lambda dst_src_len: dst_src_len[1])
+                target.sort(  # pyright: ignore[reportUnboundVariable]
+                    key=lambda dst_src_len: dst_src_len[1]
+                )
 
     return (
         seeds,
@@ -111,7 +115,7 @@ def get_data(content: str) -> tuple[list[int], list[Function]]:
 def part1(data: tuple[list[int], list[Function]]) -> int:
     def seed_to_location(value: int) -> int:
         for func in mapping_functions:
-            value = func(value)
+            value = func(value)  # pyright: ignore[reportGeneralTypeIssues]
         return value
 
     seeds, mapping_functions = data
@@ -122,7 +126,7 @@ def part2(data: tuple[list[int], list[Function]]) -> int:
     def seed_range_to_location(i: Interval) -> int:
         intervals = [i]
         for func in mapping_functions:
-            intervals = list(func(intervals))
+            intervals = list(func(intervals))  # pyright: ignore[reportGeneralTypeIssues]
 
         return min(start for start, _ in intervals)
 

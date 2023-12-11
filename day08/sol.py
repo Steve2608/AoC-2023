@@ -1,5 +1,6 @@
 import itertools as it
 import math
+from functools import partial
 from typing import Callable
 
 from timing_util import Timing
@@ -14,7 +15,7 @@ def get_data(content: str) -> tuple[str, dict[str, tuple[str, str]]]:
     return directions, nodes
 
 
-def follow_path(
+def period_length(
     curr: str,
     directions: str,
     nodes: dict[str, tuple[str, str]],
@@ -34,7 +35,7 @@ def part1(data: tuple[str, dict[str, tuple[str, str]]]) -> int:
         return node == "ZZZ"
 
     directions, nodes = data
-    return follow_path("AAA", directions, nodes, is_end)
+    return period_length("AAA", directions, nodes, is_end)
 
 
 def part2(data: tuple[str, dict[str, tuple[str, str]]]) -> int:
@@ -42,12 +43,9 @@ def part2(data: tuple[str, dict[str, tuple[str, str]]]) -> int:
         return node[-1] == "Z"
 
     directions, nodes = data
-    return math.lcm(
-        *(
-            follow_path(start, directions, nodes, is_end)
-            for start in filter(lambda node: node[-1] == "A", nodes)
-        )
-    )
+    period = partial(period_length, directions=directions, nodes=nodes, is_end=is_end)
+
+    return math.lcm(*map(period, (node for node in nodes if node[-1] == "A")))
 
 
 if __name__ == "__main__":

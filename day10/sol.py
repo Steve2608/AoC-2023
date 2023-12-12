@@ -134,18 +134,14 @@ def set_tile(x: int, y: int, tile: str, zoomed: list[list[str]]):
             raise ValueError
 
     for i, fill in enumerate(fill_in):
-        x_ = x * 3 + i
-        zoomed[x_][y * 3 : (y + 1) * 3] = fill
+        zoomed[x * 3 + i][y * 3 : (y + 1) * 3] = fill
 
 
-def init_zoomed(grid: list[list[str]], path: set[tuple[int, int]]) -> list[list[str]]:
+def init_zoomed(grid: list[list[str]], path: list[tuple[int, int]]) -> list[list[str]]:
     # replace every tile with a 3-by-3 "zoomed in" tile
     zoomed = [[" " for _ in range(len(grid[0] * 3))] for _ in range(len(grid) * 3)]
-    for x, line in enumerate(grid):
-        for y, pipe in enumerate(line):
-            # if we're not on the path, just assume we're ground
-            if (x, y) in path:
-                set_tile(x, y, pipe, zoomed)
+    for x, y in path:
+        set_tile(x, y, grid[x][y], zoomed)
     return zoomed
 
 
@@ -165,13 +161,10 @@ def is_inside(
     fringe = collections.deque([start])
     while fringe:
         curr = fringe.popleft()
-        if curr in visited:
-            continue
-        visited.add(curr)
 
         x, y = curr
         for i, j in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
-            if i < 0 or i >= M or j < 0 or j >= N:
+            if (step := (i, j)) in known_outside or i < 0 or i >= M or j < 0 or j >= N:
                 known_outside.update(visited)
                 return False
 
@@ -179,8 +172,13 @@ def is_inside(
             if zoomed[i][j] == "x":
                 continue
 
-            if (step := (i, j)) not in visited:
+            if step in known_inside:
+                known_inside.update(visited)
+                return True
+
+            if step not in visited:
                 fringe.append(step)
+                visited.add(step)
 
     known_inside.update(visited)
     return True
@@ -205,10 +203,10 @@ def count_inside(
 def part2(data: tuple[tuple[int, int], list[list[str]]]) -> int:
     start, grid = data
 
-    path = set(trace_path(start, grid))
+    path = trace_path(start, grid)
     zoomed = init_zoomed(grid, path)
 
-    return count_inside(grid, zoomed, path)
+    return count_inside(grid, zoomed, set(path))
 
 
 if __name__ == "__main__":

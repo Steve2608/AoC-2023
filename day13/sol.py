@@ -9,12 +9,18 @@ def get_data(content: str) -> list[list[list[str]]]:
 
 
 def is_palindrome(seq1, seq2) -> bool:
-    return all(a == b for a, b in zip(seq1, seq2))
+    for a, b in zip(seq1, seq2):
+        if a != b:
+            return False
+    return True
 
 
 def mirror_vertically(chunk: list[list[str]]):
     for i in range(1, len(chunk[0])):
-        if all(is_palindrome(reversed(line[:i]), line[i:]) for line in chunk):
+        for line in chunk:
+            if not is_palindrome(reversed(line[:i]), line[i:]):
+                break
+        else:
             yield i
 
 
@@ -48,13 +54,13 @@ def smudge(chunk: list[list[str]]) -> int:
             case ".":
                 chunk_smudge[i][j] = "#"
 
-        for reflection in mirror_vertically(chunk_smudge):
-            if reflection != v:
-                return reflection
+        for refl in mirror_vertically(chunk_smudge):
+            if refl != v:
+                return refl
 
-        for reflection in mirror_horizontally(chunk_smudge):
-            if reflection != h:
-                return reflection * 100
+        for refl in mirror_horizontally(chunk_smudge):
+            if refl != h:
+                return refl * 100
 
         # restore original
         chunk_smudge[i][j] = cache

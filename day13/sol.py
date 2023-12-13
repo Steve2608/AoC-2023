@@ -40,10 +40,9 @@ def part1(data: list[list[list[str]]]) -> int:
 def smudge(chunk: list[list[str]]) -> int:
     v = next(mirror_vertically(chunk), None)
     h = next(mirror_horizontally(chunk), None)
+    chunk_smudge = copy.deepcopy(chunk)
     for i, j in it.product(range(len(chunk)), range(len(chunk[0]))):
-        chunk_smudge = copy.deepcopy(chunk)
-
-        match chunk_smudge[i][j]:
+        match cache := chunk_smudge[i][j]:
             case "#":
                 chunk_smudge[i][j] = "."
             case ".":
@@ -56,6 +55,9 @@ def smudge(chunk: list[list[str]]) -> int:
         for reflection in mirror_horizontally(chunk_smudge):
             if reflection != h:
                 return reflection * 100
+
+        # restore original
+        chunk_smudge[i][j] = cache
     raise ValueError
 
 

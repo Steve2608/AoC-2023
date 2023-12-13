@@ -1,3 +1,5 @@
+from typing import Iterator
+
 from timing_util import Timing
 
 
@@ -6,10 +8,11 @@ def get_data(content: str) -> list[str]:
 
 
 def calibration_number(line: str) -> int:
-    def parse_number(line: str) -> int:
+    def parse_number(line: str | Iterator[str]) -> int:
         for char in line:
             if char.isdigit():
                 return int(char)
+        raise ValueError
 
     first = parse_number(line)
     last = parse_number(reversed(line))
@@ -21,7 +24,7 @@ def part1(data: list[str]) -> int:
 
 
 def calibration_word(line: str) -> int:
-    def parse_number_left(line: str) -> int:
+    def parse_number_left(line: str | Iterator[str]) -> int:
         chunk = ""
         for char in line:
             # if we encounter a number: return it immediately
@@ -50,8 +53,9 @@ def calibration_word(line: str) -> int:
                 return 7
             if chunk == "eight":
                 return 8
+        raise ValueError
 
-    def parse_number_right(line: str) -> int:
+    def parse_number_right(line: str | Iterator[str]) -> int:
         chunk = ""
         for char in line:
             # if we encounter a number: return it immediately
@@ -80,6 +84,7 @@ def calibration_word(line: str) -> int:
                 return 7
             if chunk == "eight":
                 return 8
+        raise ValueError
 
     first = parse_number_left(line)
     second = parse_number_right(reversed(line))

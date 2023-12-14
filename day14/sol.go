@@ -25,21 +25,16 @@ func ParseInput(data string) [][]rune {
 }
 
 func StepNorth(state [][]rune) {
-	has_changed := true
-	for has_changed {
-		has_changed = false
-		for y := 1; y < len(state); y++ {
-			for x, val := range state[y] {
-				if val == 'O' && state[y-1][x] == '.' {
-					i := y - 1
-					for i >= 1 && state[i-1][x] == '.' {
-						i--
-					}
-
-					state[i][x] = 'O'
-					state[y][x] = '.'
-					has_changed = true
+	for y := 1; y < len(state); y++ {
+		for x, val := range state[y] {
+			if val == 'O' && state[y-1][x] == '.' {
+				i := y - 1
+				for i >= 1 && state[i-1][x] == '.' {
+					i--
 				}
+
+				state[i][x] = 'O'
+				state[y][x] = '.'
 			}
 		}
 	}
@@ -67,71 +62,58 @@ func clone(data [][]rune) [][]rune {
 }
 
 func Part1(data [][]rune) int {
-	return Score(clone(data))
+	state := clone(data)
+	StepNorth(state)
+	return Score(state)
 }
 
 func StepWest(state [][]rune) {
-    has_changed := true
-	for has_changed {
-		has_changed = false
-		for _, row := range state {
-			for x := 1; x < len(row); x++ {
-				val := row[x]
-				if val == 'O' && row[x-1] == '.' {
-					i := x - 1
-					for i >= 1 && row[i-1] == '.' {
-						i--
-					}
-
-					row[i] = 'O'
-					row[x] = '.'
-					has_changed = true
+	for _, row := range state {
+		for x := 1; x < len(row); x++ {
+			val := row[x]
+			if val == 'O' && row[x-1] == '.' {
+				i := x - 1
+				for i >= 1 && row[i-1] == '.' {
+					i--
 				}
+
+				row[i] = 'O'
+				row[x] = '.'
 			}
 		}
 	}
 }
 
 func StepSouth(state [][]rune) {
-    has_changed := true
-	for has_changed {
-        has_changed = false
-		for y := len(state) - 2; y >= 0; y-- {
-            for x, val := range state[y] {
-                if val == 'O' && state[y+1][x] == '.' {
-                    i := y + 1
-					for i < len(state)-1 && state[i+1][x] == '.' {
-                        i++
-					}
-                    
-					state[i][x] = 'O'
-					state[y][x] = '.'
-					has_changed = true
+	for y := len(state) - 2; y >= 0; y-- {
+		for x, val := range state[y] {
+			if val == 'O' && state[y+1][x] == '.' {
+				i := y + 1
+				for i < len(state)-1 && state[i+1][x] == '.' {
+					i++
 				}
+				
+				state[i][x] = 'O'
+				state[y][x] = '.'
 			}
 		}
 	}
 }
 
 func StepEast(state [][]rune) {
-    has_changed := true
-    for has_changed {
-        has_changed = false
-        for _, row := range state {
-            for x := len(row) - 2; x >= 0; x-- {
-                val := row[x]
-                if val == 'O' && row[x+1] == '.' {
-                    i := x + 1
-                    for i < len(row)-1 && row[i+1] == '.' {
-                        i++
-                    }
+	for _, row := range state {
+		for x := len(row) - 2; x >= 0; x-- {
+			val := row[x]
+			if val == 'O' && row[x+1] == '.' {
+				i := x + 1
+				for i < len(row)-1 && row[i+1] == '.' {
+					i++
+				}
 
-                    row[i] = 'O'
-                    row[x] = '.'
-                    has_changed = true
-                }
-            }
-        }
+				row[i] = 'O'
+				row[x] = '.'
+			}
+		}
     }
 }
 

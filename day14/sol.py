@@ -8,19 +8,15 @@ def get_data(data: str) -> list[list[str]]:
 
 
 def step_north(state: list[list[str]]):
-    has_changed = True
-    while has_changed:
-        has_changed = False
-        for y, row in enumerate(state[1:], 1):
-            for x, val in enumerate(row):
-                if val == "O" and state[y - 1][x] == ".":
-                    i = y - 1
-                    while i > 0 and state[i - 1][x] == ".":
-                        i -= 1
+    for y, row in enumerate(state[1:], 1):
+        for x, val in enumerate(row):
+            if val == "O" and state[y - 1][x] == ".":
+                i = y - 1
+                while i >= 1 and state[i - 1][x] == ".":
+                    i -= 1
 
-                    state[i][x] = "O"
-                    state[y][x] = "."
-                    has_changed = True
+                state[i][x] = "O"
+                state[y][x] = "."
 
 
 def score(state: list[list[str]]) -> int:
@@ -38,51 +34,39 @@ def part1(data: list[list[str]]) -> int:
 
 
 def step_west(state: list[list[str]]):
-    has_changed = True
-    while has_changed:
-        has_changed = False
-        for y, row in enumerate(state):
-            for x, val in reversed(list(enumerate(row[1:], 1))):
-                if val == "O" and state[y][x - 1] == ".":
-                    i = x - 1
-                    while i > 0 and state[y][i - 1] == ".":
-                        i -= 1
+    for row in state:
+        for x, val in enumerate(row[1:], 1):
+            if val == "O" and row[x - 1] == ".":
+                i = x - 1
+                while i >= 1 and row[i - 1] == ".":
+                    i -= 1
 
-                    state[y][x - 1] = "O"
-                    state[y][x] = "."
-                    has_changed = True
+                row[i] = "O"
+                row[x] = "."
 
 
 def step_south(state: list[list[str]]):
-    has_changed = True
-    while has_changed:
-        has_changed = False
-        for y, row in reversed(list(enumerate(state[:-1]))):
-            for x, val in enumerate(row):
-                if val == "O" and state[y + 1][x] == ".":
-                    i = y + 1
-                    while i < len(state) - 1 and state[i + 1][x] == ".":
-                        i += 1
+    for y, row in reversed(list(enumerate(state[:-1]))):
+        for x, val in enumerate(row):
+            if val == "O" and state[y + 1][x] == ".":
+                i = y + 1
+                while i < len(state) - 1 and state[i + 1][x] == ".":
+                    i += 1
 
-                    state[i][x] = "O"
-                    state[y][x] = "."
-                    has_changed = True
+                state[i][x] = "O"
+                state[y][x] = "."
 
 
 def step_east(state: list[list[str]]):
-    has_changed = True
-    while has_changed:
-        has_changed = False
-        for y, row in enumerate(state):
-            for x, val in enumerate(row[:-1]):
-                if val == "O" and state[y][x + 1] == ".":
-                    i = x + 1
-                    while i < len(row) - 1 and state[y][i + 1] == ".":
-                        i += 1
+    for row in state:
+        for x, val in reversed(list(enumerate(row[:-1]))):
+            if val == "O" and row[x + 1] == ".":
+                i = x + 1
+                while i < len(row) - 1 and row[i + 1] == ".":
+                    i += 1
 
-                    state[y][i] = "O"
-                    state[y][x] = "."
-                    has_changed = True
+                row[i] = "O"
+                row[x] = "."
 
 
 def cycle(state: list[list[str]]):

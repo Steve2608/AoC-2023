@@ -80,4 +80,4 @@ if __name__ == "__main__":
             data = get_data(in_file.read().strip())
 
         print(f"part1: {part1(data)}")
-        print(f"part2: {part2(data)}")  # > 889
+        print(f"part2: {part2(data)}")

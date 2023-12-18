@@ -28,25 +28,23 @@ def get_vertices(lines: list[tuple[Direction, int]]) -> list[Point2D]:
 
 
 def trench_area(vertices: list[Point2D]) -> int:
-    def shoelace_area(vertices: list[Point2D]) -> int:
-        N = len(vertices)
+    def shoelace_area(v: list[Point2D]) -> int:
+        N = len(v)
         area = 0
 
         for i in range(N - 1):
-            area += vertices[i][0] * vertices[i + 1][1] - vertices[i][1] * vertices[i + 1][0]
-        area += vertices[N - 1][0] * vertices[0][1] - vertices[N - 1][1] * vertices[0][0]
+            area += v[i][0] * v[i + 1][1] - v[i][1] * v[i + 1][0]
+        area += v[N - 1][0] * v[0][1] - v[N - 1][1] * v[0][0]
 
         return abs(area) // 2
 
-    def circumference(vertices: list[Point2D]) -> int:
-        circumference = 0
-        for i in range(len(vertices) - 1):
-            circumference += abs(vertices[i][0] - vertices[i + 1][0]) + abs(
-                vertices[i][1] - vertices[i + 1][1]
-            )
-        return circumference
+    def perimeter(v: list[Point2D]) -> int:
+        p = 0
+        for i in range(len(v) - 1):
+            p += abs(v[i][0] - v[i + 1][0]) + abs(v[i][1] - v[i + 1][1])
+        return p
 
-    return shoelace_area(vertices) + circumference(vertices) // 2 + 1
+    return shoelace_area(vertices) + perimeter(vertices) // 2 + 1
 
 
 def part1(data: list[str]) -> int:

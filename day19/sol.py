@@ -11,20 +11,49 @@ class Part:
     s: int
 
 
-@dc.dataclass
+@dc.dataclass(slots=True, frozen=True)
 class Workflow:
     name: str
     rules: list[str]
 
     def __call__(self, Part) -> str:
-        # populating locals() so eval can work
-        x, m, a, s = Part.x, Part.m, Part.a, Part.s
         for rule in self.rules:
             if ":" in rule:
-                if eval(rule[: rule.index(":")]):
-                    return rule[rule.index(":") + 1 :]
-                continue
-            return rule
+                r = rule[: (then := rule.index(":"))]
+                less_than = r[1] == "<"
+                value = int(r[2:then])
+                target = rule[then + 1 :]
+                match r[0]:
+                    case "x":
+                        if less_than:
+                            if Part.x < value:
+                                return target
+                        else:
+                            if Part.x >= value:
+                                return target
+                    case "m":
+                        if less_than:
+                            if Part.m < value:
+                                return target
+                        else:
+                            if Part.m >= value:
+                                return target
+                    case "a":
+                        if less_than:
+                            if Part.a < value:
+                                return target
+                        else:
+                            if Part.a >= value:
+                                return target
+                    case "s":
+                        if less_than:
+                            if Part.s < value:
+                                return target
+                        else:
+                            if Part.s >= value:
+                                return target
+            else:
+                return rule
         raise ValueError("No rule matched")
 
 
@@ -46,8 +75,8 @@ def get_data(data: str) -> tuple[dict[str, Workflow], list[Part]]:
 
 def part1(data: tuple[dict[str, Workflow], list[Part]]) -> int:
     workflows, parts = data
-    score = 0
 
+    score = 0
     in_ = workflows["in"]
     for part in parts:
         rule = in_(part)

@@ -69,13 +69,10 @@ def get_data(data: str) -> dict[str, Module]:
         name, inputs = line.split(" -> ")
         inputs = inputs.split(", ")
         if name.startswith("%"):
-            module_type = FlipFlop
             name = name[1:]
         elif name.startswith("&"):
-            module_type = NAND
             name = name[1:]
         elif name == "broadcaster":
-            module_type = Module
             name = "broadcaster"
         else:
             raise ValueError(f"Unknown module type: {name}")
@@ -89,8 +86,7 @@ def get_data(data: str) -> dict[str, Module]:
         modules[name].modules = [modules[inp] for inp in inputs]
 
     for conj, inputs in conjunctions.items():
-        for name in inputs:
-            modules[conj].inputs[name] = False
+        modules[conj].inputs = {name: False for name in inputs}
 
     return modules
 
@@ -121,9 +117,7 @@ def part2(data: dict[str, Module], last_module: str = "rx") -> int:
                     return dict(zip(module.inputs, it.repeat(0)))
         raise ValueError("No solution found")
 
-    data = copy.deepcopy(data)
-    NAND_inputs = find_last_NAND(data, last_module)
-
+    NAND_inputs = find_last_NAND(data := copy.deepcopy(data), last_module)
     broadcaster = data["broadcaster"]
     for i in it.count(1):
         queue: deque[tuple[Module, bool, str]] = deque([(broadcaster, False, "button")])

@@ -10,39 +10,39 @@ from timing_util import Timing
 @dc.dataclass
 class Module:
     name: str
-    modules: list["Module"]
+    modules: list["Module"] = dc.field(default_factory=list)
 
-    def __call__(self, high: bool, from_: str | None = None) -> list[tuple["Module", bool, str]]:
+    def __call__(self, high: bool, src: str) -> list[tuple["Module", bool, str]]:
         return [(module, high, self.name) for module in self.modules]
 
 
 @dc.dataclass
 class Button(Module):
-    def __call__(self, high: bool, from_: str | None = None) -> list[tuple["Module", bool, str]]:
-        return super().__call__(high=False, from_=self.name)
+    def __call__(self, high: bool, src: str) -> list[tuple["Module", bool, str]]:
+        return super().__call__(high=False, src=self.name)
 
 
 @dc.dataclass
-class FlipFlopper(Module):
+class FlipFlop(Module):
     state: bool = False
 
-    def __call__(self, high: bool, from_: str | None = None) -> list[tuple["Module", bool, str]]:
+    def __call__(self, high: bool, src: str) -> list[tuple["Module", bool, str]]:
         if high:
             return []
         else:
             self.state = not self.state
-            return super().__call__(high=self.state, from_=self.name)
+            return super().__call__(high=self.state, src=self.name)
 
 
 @dc.dataclass
-class Conjunction(Module):
+class NAND(Module):
     inputs: dict[str, bool] = dc.field(default_factory=dict)
 
-    def __call__(self, high: bool, from_: str) -> list[tuple["Module", bool, str]]:
-        self.inputs[from_] = high
+    def __call__(self, high: bool, src: str) -> list[tuple["Module", bool, str]]:
+        self.inputs[src] = high
         if all(self.inputs.values()):
-            return super().__call__(high=False, from_=self.name)
-        return super().__call__(high=True, from_=self.name)
+            return super().__call__(high=False, src=self.name)
+        return super().__call__(high=True, src=self.name)
 
 
 def get_data(data: str) -> dict[str, Module]:
@@ -51,10 +51,10 @@ def get_data(data: str) -> dict[str, Module]:
     for line in data.split("\n"):
         name, inputs = line.split(" -> ")
         if name.startswith("%"):
-            module_type = FlipFlopper
+            module_type = FlipFlop
             name = name[1:]
         elif name.startswith("&"):
-            module_type = Conjunction
+            module_type = NAND
             name = name[1:]
             conjunctions[name] = []
         elif name == "broadcaster":
@@ -63,16 +63,16 @@ def get_data(data: str) -> dict[str, Module]:
         else:
             raise ValueError(f"Unknown module type: {name}")
 
-        modules[name] = module_type(name=name, modules=[])
+        modules[name] = module_type(name=name)
 
     for line in data.split("\n"):
         name, inputs = line.split(" -> ")
         inputs = inputs.split(", ")
         if name.startswith("%"):
-            module_type = FlipFlopper
+            module_type = FlipFlop
             name = name[1:]
         elif name.startswith("&"):
-            module_type = Conjunction
+            module_type = NAND
             name = name[1:]
         elif name == "broadcaster":
             module_type = Module
@@ -82,7 +82,7 @@ def get_data(data: str) -> dict[str, Module]:
 
         for inp in inputs:
             if inp not in modules:
-                modules[inp] = Module(name=inp, modules=[])
+                modules[inp] = Module(name=inp)
             if inp in conjunctions:
                 conjunctions[inp].append(name)
 
@@ -103,44 +103,43 @@ def part1(data: dict[str, Module]) -> int:
     for _ in range(1_000):
         queue: deque[tuple[Module, bool, str]] = deque([(broadcaster, False, "button")])
         while queue:
-            module, high, from_ = queue.popleft()
-            if high:
-                high_count += 1
-            else:
-                low_count += 1
+            module, high, src = queue.popleft()
 
-            queue.extend(module(high=high, from_=from_))
+            high_count += high
+            low_count += not high
+
+            queue.extend(module(high=high, src=src))
 
     return high_count * low_count
 
 
-def part2(data: dict[str, Module]) -> int:
-    def find_last_conjunction(data: dict[str, Module]) -> dict[str, int]:
+def part2(data: dict[str, Module], last_module: str = "rx") -> int:
+    def find_last_NAND(data: dict[str, Module], last_module: str) -> dict[str, int]:
         for module in data.values():
             for m in module.modules:
-                if m.name == "rx" and isinstance(module, Conjunction):
+                if m.name == last_module and isinstance(module, NAND):
                     return dict(zip(module.inputs, it.repeat(0)))
         raise ValueError("No solution found")
 
     data = copy.deepcopy(data)
-    conj_inputs = find_last_conjunction(data)
+    NAND_inputs = find_last_NAND(data, last_module)
 
     broadcaster = data["broadcaster"]
     for i in it.count(1):
         queue: deque[tuple[Module, bool, str]] = deque([(broadcaster, False, "button")])
         while queue:
-            module, high, from_ = queue.popleft()
-            if (n := module.name) in conj_inputs and not high:
+            module, high, src = queue.popleft()
+            if (n := module.name) in NAND_inputs and not high:
                 # assign period of input for last conjunction
-                if not conj_inputs[n]:
-                    conj_inputs[n] = i
+                if not NAND_inputs[n]:
+                    NAND_inputs[n] = i
 
             # if we found the period of all conjunctions
             # return least common multiple of all periods
-            if all(v := conj_inputs.values()):
+            if all(v := NAND_inputs.values()):
                 return math.lcm(*v)
 
-            queue.extend(module(high=high, from_=from_))
+            queue.extend(module(high=high, src=src))
     raise ValueError("No solution found")
 
 

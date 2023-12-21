@@ -16,7 +16,8 @@ def get_data(data: str) -> tuple[Point2D, list[str]]:
 
 
 # https://github.com/dancarmoz/AoC2023/blob/main/day21.py
-def cumbfs(grid: list[str], start: Point2D, n_steps: int):
+# used to be a "basic" bfs, but changed it to make part2 work
+def cumbfs(grid: list[str], start: Point2D, n_steps: int) -> list[int]:
     X, Y = len(grid), len(grid[0])
     sizes = [0, 1]
     prev, curr = set(), {start}
@@ -53,7 +54,7 @@ def part2(data: tuple[Point2D, list[str]], n_steps: int = 26501365) -> int:
 
     # the amount of reachable spaces after n steps is a quadratic function
     # f(n) = a*n^2 + b*n + C
-    sizes = cumbfs(grid, start, steps=(n_steps % N) + 2 * N)[n_steps % N :: N]
+    sizes = cumbfs(grid, start, n_steps=(n_steps % N) + 2 * N)[n_steps % N :: N]
 
     # fitting the quadratic
     diff = [b - a for a, b in zip(sizes[:-1], sizes[1:])]

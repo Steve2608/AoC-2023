@@ -69,7 +69,7 @@ def part2(data: tuple[Point2D, list[str]], n_steps: int = 26501365) -> int:
 
     # also only works since the grid is a square, the start is in the middle of the square
     # and n_steps is a multiple of N + N//2
-    # f(n) = a*n^2 + b*n + C
+    # f(n) = a*n^2 + b*n + c
     def f(x: int) -> int:
         return a * x * x + b * x + c
 

@@ -40,6 +40,18 @@ def part1(data: tuple[Point2D, list[str]], n_steps: int = 64) -> int:
 
 
 def part2(data: tuple[Point2D, list[str]], n_steps: int = 26501365) -> int:
+    def quadratic_fit(x: list[int], y: list[int]) -> tuple:
+        x1, x2, x3 = x
+        y1, y2, y3 = y
+
+        denom = (x1 - x2) * (x1 - x3) * (x2 - x3)
+
+        a = (x3 * (y2 - y1) + x2 * (y1 - y3) + x1 * (y3 - y2)) / denom
+        b = (x3**2 * (y1 - y2) + x2**2 * (y3 - y1) + x1**2 * (y2 - y3)) / denom
+        c = (x2 * x3 * (x2 - x3) * y1 + x3 * x1 * (x3 - x1) * y2 + x1 * x2 * (x1 - x2) * y3) / denom
+
+        return a, b, c
+
     start, grid = data
     N = len(grid)
 
@@ -49,21 +61,19 @@ def part2(data: tuple[Point2D, list[str]], n_steps: int = 26501365) -> int:
     # since there's no obstacles in the same column / row as the start
     # area has to grow quadratically
 
-    # also only works since the grid is a square, the start is in the middle of the square
-    # and n_steps is a multiple of N + N//2
-
     # the amount of reachable spaces after n steps is a quadratic function
-    # f(n) = a*n^2 + b*n + C
     sizes = cumbfs(grid, start, n_steps=(n_steps % N) + 2 * N)[n_steps % N :: N]
 
     # fitting the quadratic
-    diff = [b - a for a, b in zip(sizes[:-1], sizes[1:])]
-    diff_diff = [b - a for a, b in zip(diff[:-1], diff[1:])]
-    a, b, c = diff_diff[0], diff[0], sizes[0]
+    a, b, c = map(int, quadratic_fit([0, 1, 2], sizes))
 
-    # solving the quadratic
-    x = n_steps // N
-    return a * x * (x - 1) // 2 + b * x + c
+    # also only works since the grid is a square, the start is in the middle of the square
+    # and n_steps is a multiple of N + N//2
+    # f(n) = a*n^2 + b*n + C
+    def f(x: int) -> int:
+        return a * x * x + b * x + c
+
+    return f(n_steps // N)
 
 
 if __name__ == "__main__":

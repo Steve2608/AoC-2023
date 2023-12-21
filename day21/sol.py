@@ -40,7 +40,7 @@ def part1(data: tuple[Point2D, list[str]], n_steps: int = 64) -> int:
 
 
 def part2(data: tuple[Point2D, list[str]], n_steps: int = 26501365) -> int:
-    def quadratic_fit(x: list[int], y: list[int]) -> tuple:
+    def quadratic_fit(x: list[int], y: list[int]) -> tuple[float, float, float]:
         x1, x2, x3 = x
         y1, y2, y3 = y
 
@@ -65,15 +65,15 @@ def part2(data: tuple[Point2D, list[str]], n_steps: int = 26501365) -> int:
     sizes = cumbfs(grid, start, n_steps=(n_steps % N) + 2 * N)[n_steps % N :: N]
 
     # fitting the quadratic
-    a, b, c = map(int, quadratic_fit([0, 1, 2], sizes))
+    a, b, c = quadratic_fit([0, 1, 2], sizes)
 
     # also only works since the grid is a square, the start is in the middle of the square
     # and n_steps is a multiple of N + N//2
     # f(n) = a*n^2 + b*n + c
-    def f(x: int) -> int:
+    def f(x: float) -> float:
         return a * x * x + b * x + c
 
-    return f(n_steps // N)
+    return int(f(n_steps // N))
 
 
 if __name__ == "__main__":

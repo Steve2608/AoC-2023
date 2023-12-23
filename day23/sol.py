@@ -117,7 +117,6 @@ def find_longest_path(grid: list[str], src: Point2D, dst: Point2D, respect_junct
 
         return max_dist
 
-    grid, src, dst = data
     junctions = find_junctions(grid) | {src, dst}
 
     distances = get_distances(grid, junctions, respect_junctions)

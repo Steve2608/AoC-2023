@@ -4,8 +4,8 @@ from z3 import Real, Solver, sat
 
 from timing_util import Timing
 
-Vec3D = tuple[int, int, int] | tuple[float, float, float]
-Vec2D = tuple[int, int] | tuple[float, float]
+Vec2D = tuple[float, float]
+Vec3D = tuple[float, float, float]
 
 
 def get_data(data: str) -> list[tuple[Vec3D, Vec3D]]:
@@ -19,17 +19,16 @@ def get_data(data: str) -> list[tuple[Vec3D, Vec3D]]:
 
 
 def intersect_vec2(a: Vec2D, a_d: Vec2D, b: Vec2D, b_d: Vec2D) -> tuple[float, float, Vec2D] | None:
-    x0a, y0a = a
     dxa, dya = a_d
-    x0b, y0b = b
     dxb, dyb = b_d
+    if (d := dxa * dyb - dxb * dya) == 0:
+        return None  # parallel lines
 
-    d = dxa * dyb - dxb * dya
-    # parallel lines
-    if d == 0:
-        return None
+    x0a, y0a = a
+    x0b, y0b = b
     t = ((x0b - x0a) * dyb + (y0a - y0b) * dxb) / d
     u = ((x0b - x0a) * dya + (y0a - y0b) * dxa) / d
+
     return t, u, (x0a + dxa * t, y0a + dya * t)
 
 
@@ -40,25 +39,19 @@ def part1(
     x_max: int = 400000000000000,
     y_max: int = 400000000000000,
 ) -> int:
-    s = 0
-    for (a_pos, a_vel), (b_pos, b_vel) in it.combinations(data, 2):
-        if nullable_intersection := intersect_vec2(a_pos[:2], a_vel[:2], b_pos[:2], b_vel[:2]):
-            t, u, (x, y) = nullable_intersection
-            # not in the future for first hailstone
-            if t < 0:
-                continue
+    def has_intersection(a: Vec2D, a_d: Vec2D, b: Vec2D, b_d: Vec2D) -> bool:
+        return (
+            (r := intersect_vec2(a, a_d, b, b_d)) is not None
+            and r[0] >= 0  # in the future for hailstone1
+            and r[1] >= 0  # in the future for hailstone2
+            and x_min <= r[2][0] <= x_max  # in the specified area (x)
+            and y_min <= r[2][1] <= y_max  # in the specified area (y)
+        )
 
-            # not in the future for second hailstone
-            if u < 0:
-                continue
-
-            # not in the specified area
-            if not (x_min <= x <= x_max and y_min <= y <= y_max):
-                continue
-
-            # found one collision
-            s += 1
-    return s
+    return sum(
+        has_intersection(a[:2], a_d[:2], b[:2], b_d[:2])  # disregard z
+        for (a, a_d), (b, b_d) in it.combinations(data, 2)
+    )
 
 
 def part2(data: list[tuple[Vec3D, Vec3D]]) -> int:

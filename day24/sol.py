@@ -18,20 +18,6 @@ def get_data(data: str) -> list[tuple[Vec3D, Vec3D]]:
     return lines
 
 
-def intersect_vec2(a: Vec2D, a_d: Vec2D, b: Vec2D, b_d: Vec2D) -> tuple[float, float, Vec2D] | None:
-    dxa, dya = a_d
-    dxb, dyb = b_d
-    if (d := dxa * dyb - dxb * dya) == 0:
-        return None  # parallel lines
-
-    x0a, y0a = a
-    x0b, y0b = b
-    t = ((x0b - x0a) * dyb + (y0a - y0b) * dxb) / d
-    u = ((x0b - x0a) * dya + (y0a - y0b) * dxa) / d
-
-    return t, u, (x0a + dxa * t, y0a + dya * t)
-
-
 def part1(
     data: list[tuple[Vec3D, Vec3D]],
     x_min: int = 200000000000000,
@@ -39,6 +25,21 @@ def part1(
     x_max: int = 400000000000000,
     y_max: int = 400000000000000,
 ) -> int:
+    def intersect_vec2(
+        a: Vec2D, a_d: Vec2D, b: Vec2D, b_d: Vec2D
+    ) -> tuple[float, float, Vec2D] | None:
+        dxa, dya = a_d
+        dxb, dyb = b_d
+        if (d := dxa * dyb - dxb * dya) == 0:
+            return None  # parallel lines
+
+        x0a, y0a = a
+        x0b, y0b = b
+        t = ((x0b - x0a) * dyb + (y0a - y0b) * dxb) / d
+        u = ((x0b - x0a) * dya + (y0a - y0b) * dxa) / d
+
+        return t, u, (x0a + dxa * t, y0a + dya * t)
+
     def has_intersection(a: Vec2D, a_d: Vec2D, b: Vec2D, b_d: Vec2D) -> bool:
         return (
             (r := intersect_vec2(a, a_d, b, b_d)) is not None

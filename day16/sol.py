@@ -2,7 +2,7 @@ from timing_util import Timing
 
 
 def get_data(data: str) -> list[str]:
-    return data.split("\n")
+    return data.splitlines()
 
 
 def follow_path(

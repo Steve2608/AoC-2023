@@ -13,7 +13,7 @@ class Game:
 
 def get_data(content: str) -> list[Game]:
     games = []
-    for line in content.split("\n"):
+    for line in content.splitlines():
         colon_idx = line.index(":")
         game_id = int(line[len("Game ") : colon_idx])
 

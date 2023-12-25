@@ -57,7 +57,7 @@ class Function:
 
 
 def get_data(content: str) -> tuple[list[int], list[Function]]:
-    lines = list(filter(bool, content.split("\n")))
+    lines = list(filter(bool, content.splitlines()))
     seeds = list(map(int, lines[0][len("seeds: ") :].split()))
 
     seed_to_soil = []

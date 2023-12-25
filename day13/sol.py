@@ -5,7 +5,7 @@ from timing_util import Timing
 
 
 def get_data(content: str) -> list[list[list[str]]]:
-    return [[list(line) for line in chunk.split("\n")] for chunk in content.split("\n\n")]
+    return [[list(line) for line in chunk.splitlines()] for chunk in content.split("\n\n")]
 
 
 def is_palindrome(seq1, seq2) -> bool:

@@ -7,7 +7,7 @@ Point2D = tuple[int, int]
 
 
 def get_data(data: str) -> list[str]:
-    return data.split("\n")
+    return data.splitlines()
 
 
 def get_vertices(lines: list[tuple[Direction, int]]) -> list[Point2D]:

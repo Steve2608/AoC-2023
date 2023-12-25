@@ -5,7 +5,7 @@ from timing_util import Timing
 
 
 def get_data(data: str) -> list[list[int]]:
-    return [list(map(int, line)) for line in data.split("\n")]
+    return [list(map(int, line)) for line in data.splitlines()]
 
 
 def ucs(

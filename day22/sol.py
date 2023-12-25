@@ -7,7 +7,7 @@ Point3D = tuple[int, int, int]
 
 def get_data(data: str) -> list[tuple[Point3D, Point3D]]:
     bricks = []
-    for line in data.split("\n"):
+    for line in data.splitlines():
         start, end = line.split("~")
         bricks.append((tuple(map(int, start.split(","))), tuple(map(int, end.split(",")))))
     return bricks

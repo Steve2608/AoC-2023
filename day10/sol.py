@@ -4,7 +4,7 @@ from timing_util import Timing
 
 
 def get_data(content: str) -> tuple[tuple[int, int], list[list[str]]]:
-    grid = [list(line) for line in content.split("\n")]
+    grid = [list(line) for line in content.splitlines()]
     for x, line in enumerate(grid):
         if "S" in line:
             y = line.index("S")

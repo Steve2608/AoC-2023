@@ -10,7 +10,7 @@ def get_data(content: str) -> tuple[str, dict[str, tuple[str, str]]]:
     directions, lines = content.split("\n\n")
     # node = (left, right)
     # ABC = (DEF, GHI)
-    nodes = {line[:3]: (line[7:10], line[12:15]) for line in lines.split("\n")}
+    nodes = {line[:3]: (line[7:10], line[12:15]) for line in lines.splitlines()}
 
     return directions, nodes
 

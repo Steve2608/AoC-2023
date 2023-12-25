@@ -4,7 +4,7 @@ from timing_util import Timing
 
 
 def get_data(data: str) -> list[list[str]]:
-    return [list(line) for line in data.split("\n")]
+    return [list(line) for line in data.splitlines()]
 
 
 def step_north(state: list[list[str]]):

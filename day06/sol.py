@@ -4,7 +4,7 @@ from timing_util import Timing
 
 
 def get_data(content: str) -> tuple[list[int], list[int]]:
-    times, distances = content.split("\n")
+    times, distances = content.splitlines()
     times = times[len("Time:") :].strip().split()
     distances = distances[len("Distance:") :].strip().split()
     return list(map(int, times)), list(map(int, distances))

@@ -9,7 +9,7 @@ Edge = tuple[Vertex, Vertex]
 def get_data(data: str) -> tuple[set[Vertex], set[Edge]]:
     vertices = set()
     edges = set()
-    for line in data.split("\n"):
+    for line in data.splitlines():
         src, dst = line.split(": ")
         dst = dst.split(" ")
 

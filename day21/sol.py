@@ -6,7 +6,7 @@ Point2D = tuple[int, int]
 
 
 def get_data(data: str) -> tuple[Point2D, list[str]]:
-    grid = data.split("\n")
+    grid = data.splitlines()
     for i, row in enumerate(grid):
         for j, char in enumerate(row):
             if char == "S":

@@ -2,7 +2,7 @@ from timing_util import Timing
 
 
 def get_data(content: str) -> list[list[int]]:
-    return list(list(map(int, line.split())) for line in content.split("\n"))
+    return list(list(map(int, line.split())) for line in content.splitlines())
 
 
 def differences(sequence: list[int]) -> list[int]:

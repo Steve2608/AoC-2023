@@ -48,7 +48,7 @@ class NAND(Module):
 def get_data(data: str) -> dict[str, Module]:
     modules = {}
     conjunctions = {}
-    for line in data.split("\n"):
+    for line in data.splitlines():
         name, inputs = line.split(" -> ")
         if name.startswith("%"):
             module_type = FlipFlop
@@ -65,7 +65,7 @@ def get_data(data: str) -> dict[str, Module]:
 
         modules[name] = module_type(name=name)
 
-    for line in data.split("\n"):
+    for line in data.splitlines():
         name, inputs = line.split(" -> ")
         inputs = inputs.split(", ")
         if name.startswith("%"):

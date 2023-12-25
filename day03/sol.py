@@ -3,7 +3,7 @@ from timing_util import Timing
 
 def get_data(content: str) -> list[list[str | int]]:
     lines = []
-    for line in content.split("\n"):
+    for line in content.splitlines():
         curr_line = []
         i = 0
         while i < len(line):

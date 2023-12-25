@@ -6,7 +6,7 @@ Point2D = tuple[int, int]
 
 
 def get_data(data: str) -> tuple[list[str], Point2D, Point2D]:
-    grid = data.split("\n")
+    grid = data.splitlines()
     src = (0, 1)
     dst = (len(grid) - 1, len(grid[0]) - 2)
 

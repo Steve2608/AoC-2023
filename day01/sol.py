@@ -4,7 +4,7 @@ from timing_util import Timing
 
 
 def get_data(content: str) -> list[str]:
-    return content.split("\n")
+    return content.splitlines()
 
 
 def calibration_number(line: str) -> int:

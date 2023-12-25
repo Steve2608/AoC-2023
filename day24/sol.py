@@ -10,7 +10,7 @@ Vec3D = tuple[float, float, float]
 
 def get_data(data: str) -> list[tuple[Vec3D, Vec3D]]:
     lines = []
-    for line in data.split("\n"):
+    for line in data.splitlines():
         position, direction = line.split(" @ ")
         position = tuple(map(int, position.split(", ")))
         direction = tuple(map(int, direction.split(", ")))

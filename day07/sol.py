@@ -95,7 +95,7 @@ def get_data(content: str) -> list[Hand]:
         cards, bid = line.split()
         return Hand(cards, int(bid))
 
-    return list(map(line_to_hand, content.split("\n")))
+    return list(map(line_to_hand, content.splitlines()))
 
 
 def part1(data: list[Hand]) -> int:

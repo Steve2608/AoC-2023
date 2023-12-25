@@ -60,14 +60,14 @@ class Workflow:
 def get_data(data: str) -> tuple[dict[str, Workflow], list[Part]]:
     workflows, parts = data.split("\n\n")
     wfs = {}
-    for line in workflows.split("\n"):
+    for line in workflows.splitlines():
         name = line[: (start := line.index("{"))]
         rules = line[start + 1 : -1].split(",")
         wfs[name] = Workflow(name, rules)
 
     ps = [
         Part(*(int(p[p.index("=") + 1 :]) for p in part.strip("{}").split(",")))
-        for part in parts.split("\n")
+        for part in parts.splitlines()
     ]
 
     return wfs, ps

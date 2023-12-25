@@ -3,7 +3,7 @@ from timing_util import Timing
 
 def get_data(content: str) -> list[tuple[str, list[int]]]:
     data = []
-    for line in content.split("\n"):
+    for line in content.splitlines():
         record, groups = line.split()
         groups = list(map(int, groups.split(",")))
         data.append((record, groups))

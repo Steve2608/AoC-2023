@@ -16,7 +16,7 @@ class Ticket:
 
 def get_data(content: str) -> list[Ticket]:
     tickets = []
-    for line in content.split("\n"):
+    for line in content.splitlines():
         colon_idx = line.index(":")
         pipe_idx = line.index("|")
         ticket_id = int(line[len("Card ") : colon_idx].lstrip())

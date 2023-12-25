@@ -5,7 +5,7 @@ from timing_util import Timing
 
 
 def get_data(content: str) -> tuple[set[tuple[int, int]], list[int], list[int]]:
-    grid = content.split("\n")
+    grid = content.splitlines()
 
     galaxies = {(x, y) for x, line in enumerate(grid) for y, c in enumerate(line) if c == "#"}
 
